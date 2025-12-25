@@ -1,6 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 import { MenuService } from './menu.service';
-import type { Item } from './interfaces/menu.interface';
+
+import { CreateItemDto } from './dto/create-item.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
+import { Item } from './entities/item.entity';
+
 
 
 
@@ -15,45 +19,40 @@ export class MenuController {
     //GET /menu 
     // Get all the items from the menu or search by name.
     @Get()
-    getMenu(@Query('search') search?: string): Item[] {
-        const menu = this.menuService.findAll();
-        if (search) {
-            return menu.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
-        }
-        return menu;
+    async findAll() : Promise<Item[]> {
+        return this.menuService.findAll();
     };
 
     //GET /menu/:id
     // Get a single item from the menu.
-    @Get(':id')
-    getSingleItem(@Param('id', ParseIntPipe) id: number): Item {
-        return this.menuService.findOne(id);
+    @Get(':uuid')
+    async findOne(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<Item> {
+        return this.menuService.findOne(uuid);
     };
+
 
     //POST /menu
     // Create a new menu item.
     @Post()
-    @HttpCode(HttpStatus.CREATED)
-    
-    createItem(@Body() newItem: Omit<Item, 'id'>): string {
-        const item =  this.menuService.create(newItem);
-        return (`The item has been created: ${JSON.stringify(item)}`);
+    async createItem(@Body() newItem: CreateItemDto): Promise<Item> {
+        return this.menuService.create(newItem);
     };
 
     //PUT /menu/:id
     // Update an existing menu item.
     @Put(':id')
-    updateItem(@Param('id', ParseIntPipe) id: number, @Body() updatedItem: Partial<Omit<Item, 'id'>>): string {
-        const item = this.menuService.update(id, updatedItem);
-        return (`The item has been updated: ${JSON.stringify(item)}`);
+    async updateItem(
+        @Param('id', ParseUUIDPipe) id: string,
+        @Body() updatedItem: UpdateItemDto
+    ): Promise<Item> {
+        return this.menuService.update(id, updatedItem);
     };
 
     //DELETE /menu/:id
     // Delete a menu item.
     @Delete(':id')
-    deleteItem(@Param('id', ParseIntPipe) id: number): string {
-        this.menuService.delete(id);
-        return (`The item with id ${id} has been deleted.`);
+    async deleteItem(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+        await this.menuService.delete(id);
     };
     
     

@@ -1,69 +1,67 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Item } from './interfaces/menu.interface';
+import type { Item as Itemtype } from './interfaces/item.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Item } from './entities/item.entity';
+import { CreateItemDto } from './dto/create-item.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 
 
 @Injectable()
 export class MenuService {
-    private menu: Item[] = [
-    {id: 1, name: "Chicken MoMo", price: 120},
-    {id: 2, name: "Veg MoMo", price: 100},
-    {id: 3, name: "Fried Rice", price: 150},
-    {id: 4, name: "Noodles", price: 130},
-    ];
+    
+    constructor(
+        @InjectRepository(Item)
+        private itemRepository: Repository<Item>,
+    ){}
 
     // Returns all menu items
-    findAll(): Item[] {
-        return this.menu;
+    async findAll(): Promise<Itemtype[]> {
+        return this.itemRepository.find();
     };
 
     // Returns a single menu item by ID
-    findOne(id: number): Item {
-        const menuitem = this.menu.find(item => item.id === id);
-        if (!menuitem) {
-            throw new NotFoundException(`Menu item with id ${id} not found`);  
+    async findOne(id: string): Promise<Itemtype> {
+        const item = await this.itemRepository.findOneBy({ id: id });
+        if (!item) {
+            throw new NotFoundException(`Item with ID ${id} not found`);
         }
-        return menuitem; 
-    };
+        return item;
 
-    // Creates a new menu item
-    create(newItem: Omit<Item, 'id'>): Item {
-        const newitem: Item = {
-            id: this.generateId(),
-            ...newItem,
-        };
-        this.menu.push(newitem);
-        return newitem;
         
     };
 
+    // Creates a new menu item
+    async create(newItem: CreateItemDto): Promise<Itemtype> {
+        const item = this.itemRepository.create(newItem);
+
+        return this.itemRepository.save(item);
+    };
+
     // Updates an existing menu item
-    update(id: number, updatedItem: Partial<Omit<Item, 'id'>>): Item {
-        const itemIndex = this.menu.findIndex(item => item.id === id);
-        if (itemIndex === -1) {
-            throw new NotFoundException(`Menu item with id ${id} not found`);
+    async update(id: string, updatedItem: UpdateItemDto): Promise<Itemtype> {
+        const item = await this.itemRepository.preload({ id, ...updatedItem });
+        if (!item) {
+            throw new NotFoundException(`Item with ID ${id} not found`);
         }
-        this.menu[itemIndex] = {
-            ...this.menu[itemIndex],
-            ...updatedItem
-        };
-        return this.menu[itemIndex];
+        return this.itemRepository.save(item);
+        
         
     };
 
     // Deletes a menu item by ID
-    delete(id: number): void {
-        const itemIndex = this.menu.findIndex(item => item.id === id);
-        if (itemIndex === -1) {
-            throw new NotFoundException(`Menu item with id ${id} not found`);
+    async delete(id: string): Promise<void> {
+        const item = await this.itemRepository.findOneBy({ id: id });
+        if (!item) {
+            throw new NotFoundException(`Item with ID ${id} not found`);
         }
-        this.menu.splice(itemIndex, 1);
+        await this.itemRepository.remove(item);
 
+       
     };
 
 
     
-    // Generates a new unique ID for a menu item
-    generateId(): number {
-        return this.menu.length > 0 ? Math.max(...this.menu.map(item => item.id)) + 1 : 1;
-    }
+    
+    
 }
