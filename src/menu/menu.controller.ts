@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 import { MenuService } from './menu.service';
 
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
-import { Item } from './entities/item.entity';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
+import { Menu } from './entities/menu.entity';
 
 
 
@@ -19,14 +19,14 @@ export class MenuController {
     //GET /menu 
     // Get all the items from the menu or search by name.
     @Get()
-    async findAll() : Promise<Item[]> {
+    async findAll() : Promise<Menu[]> {
         return this.menuService.findAll();
     };
 
     //GET /menu/:id
     // Get a single item from the menu.
     @Get(':uuid')
-    async findOne(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<Item> {
+    async findOne(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<Menu> {
         return this.menuService.findOne(uuid);
     };
 
@@ -34,7 +34,7 @@ export class MenuController {
     //POST /menu
     // Create a new menu item.
     @Post()
-    async createItem(@Body() newItem: CreateItemDto): Promise<Item> {
+    async createItem(@Body() newItem: CreateMenuDto): Promise<Menu> {
         return this.menuService.create(newItem);
     };
 
@@ -43,8 +43,8 @@ export class MenuController {
     @Put(':id')
     async updateItem(
         @Param('id', ParseUUIDPipe) id: string,
-        @Body() updatedItem: UpdateItemDto
-    ): Promise<Item> {
+        @Body() updatedItem: UpdateMenuDto
+    ): Promise<Menu> {
         return this.menuService.update(id, updatedItem);
     };
 

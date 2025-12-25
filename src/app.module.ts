@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MenuModule } from './menu/menu.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Item } from './menu/entities/item.entity';
+import { Menu } from './menu/entities/menu.entity';
 
 
 
@@ -16,7 +16,7 @@ import { Item } from './menu/entities/item.entity';
       username: 'user',
       password: 'passs',
       database: 'restaurantdb',
-      entities: [Item],
+      entities: [Menu],
       synchronize: true,
 
     }),

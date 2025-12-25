@@ -1,28 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Item as Itemtype } from './interfaces/item.interface';
+import type { Menu as Itemtype } from './interfaces/menu.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Item } from './entities/item.entity';
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
+import { Menu } from './entities/menu.entity';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 
 
 @Injectable()
 export class MenuService {
     
     constructor(
-        @InjectRepository(Item)
-        private itemRepository: Repository<Item>,
+        @InjectRepository(Menu)
+        private menuRepository: Repository<Menu>,
     ){}
 
     // Returns all menu items
     async findAll(): Promise<Itemtype[]> {
-        return this.itemRepository.find();
+        return this.menuRepository.find();
     };
 
     // Returns a single menu item by ID
     async findOne(id: string): Promise<Itemtype> {
-        const item = await this.itemRepository.findOneBy({ id: id });
+        const item = await this.menuRepository.findOneBy({ id: id });
         if (!item) {
             throw new NotFoundException(`Item with ID ${id} not found`);
         }
@@ -32,31 +32,30 @@ export class MenuService {
     };
 
     // Creates a new menu item
-    async create(newItem: CreateItemDto): Promise<Itemtype> {
-        const item = this.itemRepository.create(newItem);
+    async create(newItem: CreateMenuDto): Promise<Itemtype> {
+        const item = this.menuRepository.create(newItem);
 
-        return this.itemRepository.save(item);
+        return this.menuRepository.save(item);
     };
 
     // Updates an existing menu item
-    async update(id: string, updatedItem: UpdateItemDto): Promise<Itemtype> {
-        const item = await this.itemRepository.preload({ id, ...updatedItem });
+    async update(id: string, updatedItem: UpdateMenuDto): Promise<Itemtype> {
+        const item = await this.menuRepository.preload({ id, ...updatedItem });
         if (!item) {
             throw new NotFoundException(`Item with ID ${id} not found`);
         }
-        return this.itemRepository.save(item);
+        return this.menuRepository.save(item);
         
         
     };
 
     // Deletes a menu item by ID
     async delete(id: string): Promise<void> {
-        const item = await this.itemRepository.findOneBy({ id: id });
+        const item = await this.menuRepository.findOneBy({ id: id });
         if (!item) {
             throw new NotFoundException(`Item with ID ${id} not found`);
         }
-        await this.itemRepository.remove(item);
-
+        await this.menuRepository.remove(item);
        
     };
 
