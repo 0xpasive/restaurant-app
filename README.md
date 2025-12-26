@@ -31,7 +31,7 @@ $ npm run start:prod
 
 ## Database Setup
 ```bash
-$ cd docker/postgere
+$ cd docker/postgres
 $ docker compose up -d
 ```
 
