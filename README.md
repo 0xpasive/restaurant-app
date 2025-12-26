@@ -1,7 +1,13 @@
-
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
 ## Description
-This is a Simple nestjs application. A simple CRUD operation for an restaurant system has been implemented in this application. Postgres Database is integrated using typeORM. This project was made to learn the basics of nest js and typeORM. This application includes concept of nestjs: module, controller, service, pipes, validator, dto, etc and typeORM: entity, repository , relations , etc. 
+This is a simple NestJS-based REST API that implements CRUD operations for a restaurant management system. The application uses PostgreSQL as the database, integrated via TypeORM.
+
+The project is built as a learning exercise to understand the core concepts of NestJS—including modules, controllers, services, pipes, DTOs, validation, and dependency injection—as well as TypeORM fundamentals such as entities, repositories, and relationships.
+
+The codebase follows a modular architecture and demonstrates clean separation of concerns between the API layer, business logic, and data persistence. 
 
 
 ## Project setup
