@@ -1,0 +1,90 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Order } from './entities/order.entity';
+import { In, Repository } from 'typeorm';
+import { Order as OrderType } from './interface/order.interface';
+import { Menu } from 'src/menu/entities/menu.entity';
+import { CreateOrderdto } from './dto/create-order.dto';
+import { Bill } from './interface/bill.interface';
+
+@Injectable()
+export class OrderService {
+    constructor(
+        @InjectRepository(Order)
+        private orderRepository: Repository<Order>,
+
+        @InjectRepository(Menu)
+        private menuRepository: Repository<Menu>,
+    ){}
+
+    async createOrder(orderData: CreateOrderdto): Promise<Order>{
+        const {tableNumber, itemsIds} = orderData;
+        const items = await this.menuRepository.find({
+            where: { id: In(itemsIds) },
+        })
+        if(items.length !== itemsIds.length){
+            throw new Error('One or more menu items not found');
+        }
+
+        const newOrder = this.orderRepository.create({
+            tableNumber,
+            items,
+        });
+
+        return this.orderRepository.save(newOrder);
+    };
+
+    async getAllOrders(): Promise<Order[]>{
+        return this.orderRepository.find({
+            relations: ['items'],
+        });
+    };
+
+    async getOrderById(id: string): Promise<Order>{
+        const order = await this.orderRepository.findOne({
+            where: { id },
+            relations: ['items'],
+        });
+        if(!order){
+            throw new NotFoundException(`Order with ID ${id} not found`);
+        }
+        return order;
+    };
+
+    async addItemsToOrder(orderId: string, itemIds: string[]): Promise<Order>{
+        const order = await this.getOrderById(orderId);
+        const itemsToAdd = await this.menuRepository.find({
+            where: { id: In(itemIds) },
+        });
+        if(itemsToAdd.length !== itemIds.length){
+            throw new Error('One or more menu items not found');
+        }
+        order.items.push(...itemsToAdd);
+        return this.orderRepository.save(order);
+
+    };
+
+    async clearOrder(orderId: string): Promise<void>{
+        const order = await this.getOrderById(orderId);
+        await this.orderRepository.remove(order);
+        
+    };
+
+
+    async geneateOrderBill(orderId: string): Promise<Bill>{
+        const order = await this.getOrderById(orderId);
+
+        const items = order.items ?? [];
+
+        const totalAmount = items.reduce(
+            (sum, item) => sum + Number(item.price),
+            0,
+        );
+
+        return {
+        tableNumber: order.tableNumber,
+        items: items.map(item => item.name),
+        totalAmount,
+        };
+    };
+}

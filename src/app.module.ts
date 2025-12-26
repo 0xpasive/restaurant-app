@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { MenuModule } from './menu/menu.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Menu } from './menu/entities/menu.entity';
+import { OrderModule } from './order/order.module';
+import { Order } from './order/entities/order.entity';
 
 
 
@@ -16,11 +18,12 @@ import { Menu } from './menu/entities/menu.entity';
       username: 'user',
       password: 'passs',
       database: 'restaurantdb',
-      entities: [Menu],
+      entities: [Menu, Order],
       synchronize: true,
 
     }),
-    MenuModule],
+    MenuModule,
+    OrderModule],
   controllers: [AppController],
   providers: [AppService],
 })
