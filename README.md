@@ -29,6 +29,12 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Database Setup
+```bash
+$ cd docker/postgere
+$ docker compose up -d
+```
+
 ## Run tests
 
 ```bash
