@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { In, Repository } from 'typeorm';
-import { Order as OrderType } from './interface/order.interface';
 import { Menu } from 'src/menu/entities/menu.entity';
 import { CreateOrderdto } from './dto/create-order.dto';
 import { Bill } from './interface/bill.interface';
 
 @Injectable()
 export class OrderService {
+    // Injecting the Order and Menu repositories
     constructor(
         @InjectRepository(Order)
         private orderRepository: Repository<Order>,
@@ -17,6 +17,8 @@ export class OrderService {
         private menuRepository: Repository<Menu>,
     ){}
 
+
+    // Creates a new order
     async createOrder(orderData: CreateOrderdto): Promise<Order>{
         const {tableNumber, itemsIds} = orderData;
         const items = await this.menuRepository.find({
@@ -34,12 +36,16 @@ export class OrderService {
         return this.orderRepository.save(newOrder);
     };
 
+
+    // Retrieves all orders with their associated menu items
     async getAllOrders(): Promise<Order[]>{
         return this.orderRepository.find({
             relations: ['items'],
         });
     };
 
+
+    //Get order by id
     async getOrderById(id: string): Promise<Order>{
         const order = await this.orderRepository.findOne({
             where: { id },
@@ -51,6 +57,7 @@ export class OrderService {
         return order;
     };
 
+    //add item to the order/ update the order
     async addItemsToOrder(orderId: string, itemIds: string[]): Promise<Order>{
         const order = await this.getOrderById(orderId);
         const itemsToAdd = await this.menuRepository.find({
@@ -64,14 +71,16 @@ export class OrderService {
 
     };
 
+
+    //delete the order
     async clearOrder(orderId: string): Promise<void>{
         const order = await this.getOrderById(orderId);
         await this.orderRepository.remove(order);
         
     };
 
-
-    async geneateOrderBill(orderId: string): Promise<Bill>{
+    //generate the bill for the existing order
+    async generateOrderBill(orderId: string): Promise<Bill>{
         const order = await this.getOrderById(orderId);
 
         const items = order.items ?? [];
