@@ -7,8 +7,6 @@ import { Menu } from './menu/entities/menu.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 
-
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -20,10 +18,10 @@ import { Order } from './order/entities/order.entity';
       database: 'restaurantdb',
       entities: [Menu, Order],
       synchronize: true,
-
     }),
     MenuModule,
-    OrderModule],
+    OrderModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
