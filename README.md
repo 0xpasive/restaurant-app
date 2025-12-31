@@ -5,7 +5,7 @@
 ## Description
 This is a simple NestJS-based REST API that implements CRUD operations for a restaurant management system. The application uses PostgreSQL as the database, integrated via TypeORM.
 
-The project is built as a learning exercise to understand the core concepts of NestJS—including modules, controllers, services, pipes, DTOs, validation, and dependency injection—as well as TypeORM fundamentals such as entities, repositories, and relationships.
+The project is built as a learning exercise to understand the core concepts of NestJS—including modules, controllers, guard , jwt , services, pipes, DTOs, validation, and dependency injection—as well as TypeORM fundamentals such as entities, repositories, and relationships.
 
 The codebase follows a modular architecture and demonstrates clean separation of concerns between the API layer, business logic, and data persistence. 
 
