@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  NotAcceptableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -22,17 +23,17 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new NotAcceptableException();
     }
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: jwtConstants.secret,
       });
-      if (payload.role === 'admin') {
-        throw new UnauthorizedException();
+      if (payload.role !== 'admin') {
+        throw new NotAcceptableException();
       }
     } catch {
-      throw new UnauthorizedException();
+      throw new NotAcceptableException();
     }
     return true;
   }
